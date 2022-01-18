@@ -1,16 +1,16 @@
 package ua.com.foxminded.lms.numberofchars;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.zip.CRC32;
 
 public class NumberOfChars {
 	public static final String END_OF_LINE = System.getProperty("line.separator");
-	private HashMap<Long, LinkedHashMap<Character, Integer>> stringDictionary;
+	private WeakHashMap<Long, LinkedHashMap<Character, Integer>> stringDictionary;
 
 	public NumberOfChars() {
-		stringDictionary = new HashMap<Long, LinkedHashMap<Character, Integer>>();
+		stringDictionary = new WeakHashMap<Long, LinkedHashMap<Character,Integer>>();
 	}
 
 	public String getCharsCounts(String input) {
@@ -21,7 +21,7 @@ public class NumberOfChars {
 		CRC32 stringCRC32 = new CRC32();
 		stringCRC32.update(input.getBytes());
 		LinkedHashMap<Character, Integer> charCount = new LinkedHashMap<Character, Integer>();
-
+		
 		if (stringDictionary.containsKey(stringCRC32.getValue())) {
 			charCount = stringDictionary.get(stringCRC32.getValue());
 		} else {
