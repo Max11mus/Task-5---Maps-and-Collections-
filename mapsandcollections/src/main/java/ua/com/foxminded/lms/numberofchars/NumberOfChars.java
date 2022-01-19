@@ -1,16 +1,17 @@
 package ua.com.foxminded.lms.numberofchars;
 
+import java.lang.ref.SoftReference;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.WeakHashMap;
 import java.util.zip.CRC32;
 
 public class NumberOfChars {
 	public static final String END_OF_LINE = System.getProperty("line.separator");
-	private WeakHashMap<Long, LinkedHashMap<Character, Integer>> stringDictionary;
+	private HashMap<Long, SoftReference<LinkedHashMap<Character, Integer>>> stringDictionary;
 
 	public NumberOfChars() {
-		stringDictionary = new WeakHashMap<Long, LinkedHashMap<Character,Integer>>();
+		stringDictionary = new HashMap<Long, SoftReference<LinkedHashMap<Character, Integer>>>();
 	}
 
 	public String getCharsCounts(String input) {
@@ -20,16 +21,24 @@ public class NumberOfChars {
 
 		CRC32 stringCRC32 = new CRC32();
 		stringCRC32.update(input.getBytes());
-		LinkedHashMap<Character, Integer> charCount = new LinkedHashMap<Character, Integer>();
-		
+		LinkedHashMap<Character, Integer> charsCount = null;
+		SoftReference<LinkedHashMap<Character, Integer>> charsCountRef;
+
 		if (stringDictionary.containsKey(stringCRC32.getValue())) {
-			charCount = stringDictionary.get(stringCRC32.getValue());
+			charsCountRef = stringDictionary.get(stringCRC32.getValue());
+			if (charsCountRef.get() == null) {
+				charsCount = countChars(input);
+				charsCountRef = new SoftReference<LinkedHashMap<Character, Integer>>(charsCount);
+			} else {
+				charsCount = charsCountRef.get();
+			}
 		} else {
-			charCount = countChars(input);
-			stringDictionary.put(stringCRC32.getValue(), charCount);
+			charsCount = countChars(input);
+			charsCountRef = new SoftReference<LinkedHashMap<Character, Integer>>(charsCount);
+			stringDictionary.put(stringCRC32.getValue(), charsCountRef);
 		}
 
-		return input + END_OF_LINE + charsCountsToString(charCount);
+		return input + END_OF_LINE + charsCountsToString(charsCount);
 	}
 
 	private LinkedHashMap<Character, Integer> countChars(String input) {

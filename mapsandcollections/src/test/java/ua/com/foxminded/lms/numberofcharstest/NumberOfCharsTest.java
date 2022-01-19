@@ -38,8 +38,7 @@ class NumberOfCharsTest {
 						+ "\"l\" - 1" + NumberOfChars.END_OF_LINE
 						+ "\"!\" - 3" + NumberOfChars.END_OF_LINE;
 		String actual = numberOfChars.getCharsCounts("Java is Cool!!!");
-		String inDictionary = "Result retrieved from dictionary.";
-		
+				
 		assertEquals(expected, actual, "Must return result.");
 		}
 	
