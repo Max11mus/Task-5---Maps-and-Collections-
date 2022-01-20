@@ -6,12 +6,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.zip.CRC32;
 
-public class NumberOfChars {
+public class CharsCounter {
 	public static final String END_OF_LINE = System.getProperty("line.separator");
-	private HashMap<Long, SoftReference<LinkedHashMap<Character, Integer>>> stringDictionary;
+	private HashMap<Long, SoftReference<LinkedHashMap<Character, Integer>>> stringCache;
 
-	public NumberOfChars() {
-		stringDictionary = new HashMap<Long, SoftReference<LinkedHashMap<Character, Integer>>>();
+	public CharsCounter() {
+		stringCache = new HashMap<Long, SoftReference<LinkedHashMap<Character, Integer>>>();
 	}
 
 	public String getCharsCounts(String input) {
@@ -24,21 +24,20 @@ public class NumberOfChars {
 		LinkedHashMap<Character, Integer> charsCount = null;
 		SoftReference<LinkedHashMap<Character, Integer>> charsCountRef;
 
-		if (stringDictionary.containsKey(stringCRC32.getValue())) {
-			charsCountRef = stringDictionary.get(stringCRC32.getValue());
-			if (charsCountRef.get() == null) {
-				charsCount = countChars(input);
-				charsCountRef = new SoftReference<LinkedHashMap<Character, Integer>>(charsCount);
-			} else {
-				charsCount = charsCountRef.get();
-			}
-		} else {
-			charsCount = countChars(input);
-			charsCountRef = new SoftReference<LinkedHashMap<Character, Integer>>(charsCount);
-			stringDictionary.put(stringCRC32.getValue(), charsCountRef);
+		if (stringCache.containsKey(stringCRC32.getValue())) {
+			charsCount = stringCache.get(stringCRC32.getValue()).get(); /*create a strongreference to make sure that 
+				the garbage collector doesn't remove softreference in the background. */
 		}
 
-		return input + END_OF_LINE + charsCountsToString(charsCount);
+		if (charsCount == null) {
+			charsCount = countChars(input);
+			charsCountRef = new SoftReference<LinkedHashMap<Character, Integer>>(charsCount);
+			stringCache.put(stringCRC32.getValue(), charsCountRef);
+		} else {
+			charsCount = stringCache.get(stringCRC32.getValue()).get();
+		}		 
+		
+				return input + END_OF_LINE + charsCountsToString(charsCount);
 	}
 
 	private LinkedHashMap<Character, Integer> countChars(String input) {
@@ -59,4 +58,5 @@ public class NumberOfChars {
 		return result;
 	}
 
+		
 }
