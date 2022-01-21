@@ -25,19 +25,15 @@ public class CharsCounter {
 		SoftReference<LinkedHashMap<Character, Integer>> charsCountRef;
 
 		if (stringCache.containsKey(stringCRC32.getValue())) {
-			charsCount = stringCache.get(stringCRC32.getValue()).get(); /*create a strongreference to make sure that 
-				the garbage collector doesn't remove softreference in the background. */
+			charsCount = stringCache.get(stringCRC32.getValue()).get();
 		}
 
 		if (charsCount == null) {
 			charsCount = countChars(input);
 			charsCountRef = new SoftReference<LinkedHashMap<Character, Integer>>(charsCount);
 			stringCache.put(stringCRC32.getValue(), charsCountRef);
-		} else {
-			charsCount = stringCache.get(stringCRC32.getValue()).get();
-		}		 
-		
-				return input + END_OF_LINE + charsCountsToString(charsCount);
+		}
+		return input + END_OF_LINE + charsCountsToString(charsCount);
 	}
 
 	private LinkedHashMap<Character, Integer> countChars(String input) {
